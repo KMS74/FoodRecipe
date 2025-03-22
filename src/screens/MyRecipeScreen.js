@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
@@ -21,20 +22,54 @@ export default function MyRecipeScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRecipes = async () => {};
+    const fetchRecipes = async () => {
+      const storedRecipes = await AsyncStorage.getItem("customRecipes");
+      const recipes = storedRecipes ? JSON.parse(storedRecipes) : [];
+      console.log("recipes", recipes);
+      setRecipes(recipes);
+      setLoading(false);
+    };
 
     fetchRecipes();
   }, []);
 
-  const handleAddRecipe = () => {};
+  const handleAddRecipe = () => {
+    navigation.navigate("RecipesFormScreen");
+  };
 
-  const handleRecipeClick = (recipe) => {};
-  const deleteRecipe = async (index) => {};
+  const handleRecipeClick = (recipe) => {
+    navigation.navigate("CustomRecipesScreen", { recipe });
+  };
+  const deleteRecipe = async (index) => {
+    try {
+      const updatedRecipes = [...recipes];
+      updatedRecipes.splice(index, 1);
+      await AsyncStorage.setItem(
+        "customRecipes",
+        JSON.stringify(updatedRecipes)
+      );
+      setRecipes(updatedRecipes);
+    } catch (error) {
+      console.error("Error deleting recipe", error);
+    }
+  };
 
-  const editRecipe = (recipe, index) => {};
+  const editRecipe = (recipe, index) => {
+    navigation.navigate("RecipesFormScreen", {
+      recipeToEdit: recipe,
+      recipeIndex: index,
+      onRecipeEdited: () => {
+        const updatedRecipes = [...recipes];
+        updatedRecipes[index] = recipe;
+        setRecipes(updatedRecipes);
+      },
+    });
+  };
 
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" />
+
       {/* Back Button */}
       <TouchableOpacity
         onPress={() => navigation.goBack()}
@@ -43,16 +78,20 @@ export default function MyRecipeScreen() {
         <Text style={styles.backButtonText}>{"Back"}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleAddRecipe} style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add New recipe</Text>
-      </TouchableOpacity>
-
       {loading ? (
         <ActivityIndicator size="large" color="#f59e0b" />
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           {recipes.length === 0 ? (
-            <Text style={styles.noRecipesText}>No recipes added yet.</Text>
+            <View>
+              <Text style={styles.noRecipesText}>No recipes added yet.</Text>
+              <TouchableOpacity
+                onPress={handleAddRecipe}
+                style={styles.addButton}
+              >
+                <Text style={styles.addButtonText}>Add New recipe</Text>
+              </TouchableOpacity>
+            </View>
           ) : (
             recipes.map((recipe, index) => (
               <View key={index} style={styles.recipeCard} testID="recipeCard">
@@ -60,18 +99,34 @@ export default function MyRecipeScreen() {
                   testID="handleRecipeBtn"
                   onPress={() => handleRecipeClick(recipe)}
                 >
+                  <Image
+                    source={{ uri: recipe.image }}
+                    style={styles.recipeImage}
+                  />
                   <Text style={styles.recipeTitle}>{recipe.title}</Text>
-                  <Text
-                    style={styles.recipeDescription}
-                    testID="recipeDesc"
-                  ></Text>
+                  <Text style={styles.recipeDescription} testID="recipeDesc">
+                    {recipe.description?.substring(0, 50) + "..."}
+                  </Text>
                 </TouchableOpacity>
 
                 {/* Edit and Delete Buttons */}
                 <View
                   style={styles.actionButtonsContainer}
                   testID="editDeleteButtons"
-                ></View>
+                >
+                  <TouchableOpacity
+                    onPress={() => editRecipe(recipe, index)}
+                    style={styles.editButton}
+                  >
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => deleteRecipe(index)}
+                    style={styles.deleteButton}
+                  >
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ))
           )}
@@ -100,8 +155,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 5,
     width: 300,
-    marginLeft: 500,
-    // marginBottom: hp(2),
+    marginTop: hp(2),
   },
   addButtonText: {
     color: "#fff",

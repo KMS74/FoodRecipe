@@ -18,22 +18,62 @@ export default function Recipe({ categories, foods }) {
   const navigation = useNavigation();
 
   const renderItem = ({ item, index }) => (
-    <ArticleCard item={item} index={index} navigation={navigation} />
+    <RecipeCard item={item} index={index} navigation={navigation} />
   );
 
   return (
     <View style={styles.container}>
-      <View testID="recipesDisplay"></View>
+      <View testID="recipesDisplay">
+        <Text style={styles.title} testID="title">
+          Latest Recipes
+        </Text>
+
+        <View testID="articlesDisplay">
+          <FlatList
+            data={foods}
+            keyExtractor={(item) => item.recipeId}
+            renderItem={renderItem}
+            numColumns={2}
+          />
+        </View>
+      </View>
     </View>
   );
 }
 
-const ArticleCard = ({ item, index, navigation }) => {
+const RecipeCard = ({ item, index, navigation }) => {
   return (
     <View
       style={[styles.cardContainer, { paddingLeft: 20, paddingRight: 15 }]}
       testID="articleDisplay"
-    ></View>
+    >
+      <View
+        style={[styles.cardContainer, { paddingLeft: 20, paddingRight: 15 }]}
+        testID="articleDisplay"
+      >
+        <TouchableOpacity
+          onPress={() => navigation.navigate("RecipeDetail", { ...item })}
+        >
+          <Image
+            source={{ uri: item.recipeImage }}
+            style={[
+              styles.articleImage,
+              { height: index % 3 === 0 ? hp(25) : hp(35) },
+            ]}
+          />
+          <Text style={styles.articleText}>
+            {item.recipeName.length > 20
+              ? item.recipeName.slice(0, 20) + "..."
+              : item.recipeName}
+          </Text>
+          <Text style={styles.articleDescription}>
+            {item.cookingDescription.length > 40
+              ? item.cookingDescription.slice(0, 40) + "..."
+              : item.cookingDescription}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 

@@ -39,7 +39,12 @@ export default function RecipeDetailScreen(props) {
       contentContainerStyle={styles.scrollContent}
     >
       {/* recipe Image */}
-      <View style={styles.imageContainer} testID="imageContainer"></View>
+      <View style={styles.imageContainer} testID="imageContainer">
+        <Image
+          source={{ uri: recipe.recipeImage }}
+          style={styles.recipeImage}
+        />
+      </View>
 
       {/* Back Button and Favorite Button */}
       <View style={styles.topButtonsContainer}>
@@ -70,16 +75,56 @@ export default function RecipeDetailScreen(props) {
           style={styles.recipeDetailsContainer}
           testID="recipeDetailsContainer"
         >
-          <Text style={styles.recipeTitle} testID="recipeTitle"></Text>
-          <Text style={styles.recipeCategory} testID="recipeCategory"></Text>
+          <Text style={styles.recipeTitle} testID="recipeTitle">
+            {recipe.recipeName}
+          </Text>
+          <Text style={styles.recipeCategory} testID="recipeCategory">
+            {recipe.recipeCategory}
+          </Text>
         </View>
-        <View style={styles.miscContainer} testID="miscContainer"></View>
+        <View style={styles.miscContainer} testID="miscContainer">
+          <View style={styles.miscItem}>
+            <Text style={styles.miscIcon}>🕒</Text>
+            <Text style={styles.miscText}>35 Mins</Text>
+          </View>
+          <View style={styles.miscItem}>
+            <Text style={styles.miscIcon}>👥</Text>
+            <Text style={styles.miscText}>03 Servings</Text>
+          </View>
+          <View style={styles.miscItem}>
+            <Text style={styles.miscIcon}>🔥</Text>
+            <Text style={styles.miscText}>103 Cal</Text>
+          </View>
+          <View style={styles.miscItem}>
+            <Text style={styles.miscIcon}>🎚️</Text>
+            <Text style={styles.miscText}>Medium</Text>
+          </View>
+        </View>
 
         {/* Ingredients */}
-        <View style={styles.sectionContainer}></View>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Ingredients</Text>
+          <View style={styles.ingredientsList} testID="ingredientsList">
+            {recipe.ingredients.map((i) => (
+              <View key={i.ingredientName} style={styles.ingredientItem}>
+                <View style={styles.ingredientBullet} />
+                <Text style={styles.ingredientText}>
+                  {i.ingredientName} {i.measure}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
 
         {/* Instructions */}
-        <View style={styles.sectionContainer} testID="sectionContainer"></View>
+        <View style={styles.sectionContainer} testID="sectionContainer">
+          <Text style={styles.sectionTitle} testID="sectionTitle">
+            Instructions
+          </Text>
+          <Text style={styles.instructionsText} testID="instructionsText">
+            {recipe.recipeInstructions}
+          </Text>
+        </View>
         {/* Description */}
       </View>
     </ScrollView>
@@ -221,9 +266,10 @@ const styles = StyleSheet.create({
   },
   miscContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    gap: 10,
     marginBottom: 20,
-    paddingHorizontal: wp(4),
+    paddingHorizontal: wp(2),
   },
   miscItem: {
     alignItems: "center",
@@ -254,7 +300,7 @@ const styles = StyleSheet.create({
     fontFamily: "Lato",
   },
   ingredientsList: {
-    marginLeft: wp(4),
+    marginLeft: wp(1),
   },
   ingredientItem: {
     flexDirection: "row",

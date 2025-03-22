@@ -58,14 +58,14 @@ export default function Categories({
           <Text style={styles.categoryText}>My Favorites</Text>
         </TouchableOpacity>
 
-        {categories.map((cat, index) => {
-          let isActive = cat.strCategory == activeCategory;
-          let activeButtonStyle = isActive
+        {categories.map((cat) => {
+          const isActive = cat.strCategory == activeCategory;
+          const activeButtonStyle = isActive
             ? styles.activeButton
             : styles.inactiveButton;
           return (
             <TouchableOpacity
-              key={index}
+              key={cat.idCategory}
               onPress={() => handleChangeCategory(cat.strCategory)}
               style={styles.categoryContainer}
             >

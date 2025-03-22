@@ -16,12 +16,35 @@ import {
 export default function RecipesFormScreen({ route, navigation }) {
   const { recipeToEdit, recipeIndex, onRecipeEdited } = route.params || {};
   const [title, setTitle] = useState(recipeToEdit ? recipeToEdit.title : "");
-  const [image, setImage] = useState(recipeToEdit ? recipeToEdit.image : "");
+  const [image, setImage] = useState(
+    recipeToEdit
+      ? recipeToEdit.image
+      : "https://images.unsplash.com/photo-1587248720327-8eb72564be1e?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  );
   const [description, setDescription] = useState(
     recipeToEdit ? recipeToEdit.description : ""
   );
 
-  const saveRecipe = async () => {};
+  const saveRecipe = async () => {
+    const newRecipe = { title, image, description };
+    try {
+      const existingRecipes = await AsyncStorage.getItem("customRecipes");
+      const recipes = existingRecipes ? JSON.parse(existingRecipes) : [];
+
+      if (recipeToEdit !== undefined) {
+        recipes[recipeIndex] = newRecipe;
+        await AsyncStorage.setItem("recipes", JSON.stringify(recipes));
+        onRecipeEdited();
+      } else {
+        recipes.push(newRecipe);
+        await AsyncStorage.setItem("customRecipes", JSON.stringify(recipes));
+      }
+
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error saving recipe", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
