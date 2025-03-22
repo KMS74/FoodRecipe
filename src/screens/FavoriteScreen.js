@@ -19,11 +19,9 @@ export default function FavoriteScreen() {
 
   // Assuming you have a similar structure for recipes in your Redux store
   const favoriteRecipes = useSelector((state) => state.favorites);
-  const favoriteRecipesList = favoriteRecipes?.favoriterecipes || [];
-  console.log(favoriteRecipes.favoriterecipes);
-  console.log('favoriteRecipesList',favoriteRecipesList);
-  
-  
+  const favoriteRecipesList = favoriteRecipes?.favoriteRecipes || [];
+  console.log(favoriteRecipes.favoriteRecipes);
+  console.log("favoriteRecipesList", favoriteRecipesList);
 
   if (favoriteRecipesList.length === 0) {
     return (
@@ -58,7 +56,7 @@ export default function FavoriteScreen() {
           My Favorite Recipes
         </Text>
       </View>
-    
+
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={{
@@ -73,7 +71,6 @@ export default function FavoriteScreen() {
       >
         <Text style={{ color: "#fff" }}>Go back</Text>
       </TouchableOpacity>
-    
     </>
   );
 }
